@@ -4,4 +4,4 @@ This program takes a propositional formula and returns a list of formulas simila
 
 Input a file with the formula on one line and the list of lists of operators on the next line.
 
-Invoke the command from your terminal with the file path: python main.py '<filepath>'
+Invoke the command from your terminal with the file path: python main.py 'example.txt'
