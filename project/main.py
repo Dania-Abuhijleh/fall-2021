@@ -5,7 +5,7 @@ print('Running' if __name__ == '__main__' else 'Importing', Path(__file__).resol
 # then abstract the formula
 # then produce all permutations of the abstracted formula by changing operators
 # can I use z3 for this by abstracting operators into unknown functions (like f represents and, or) then enumerate all models and reconstruct formula for each model?
-from typing import Set
+from typing import List, Set
 from z3 import *
 from pythonds.basic import Stack
 from pythonds.trees import BinaryTree
@@ -15,10 +15,27 @@ import string
 #from .parseTree import ParseTree
 from package.parseTree import ParseTree
 from package.propParser import PropParser
+import click
+import ast
 
 global listOfOperators
-#take in list of lists of operators?
+
+@click.command()
+@click.argument('filepath', type=click.Path(exists=True))
+def readFile(filepath):
+    with open(filepath, 'r', encoding='utf-8-sig') as f:
+        formula = f.readline()
+        operators = ast.literal_eval(f.readline())
+        print(formula)
+        print(operators)
+        main(formula, operators)
+
+#take in list of lists of operators
+# @click.command()
+# @click.argument('strFormula')
+# @click.argument('operators', type=List)
 def main(strFormula, operators):
+    #click.echo('Enter the formula as a string and a list of lists of operators')
     global listOfOperators
     listOfOperators = operators
     parser = ParseTree()
@@ -279,7 +296,7 @@ def parenCombFormatted(flist):
     parser = PropParser()
     for f in flist:
         z3_exp = parser.parse(f)
-        print(z3_exp)
+        #print(z3_exp)
         valid = checkValid(z3_exp)
         sat = checkSat(z3_exp)
         result.append(" ".join([f, valid, sat]))
@@ -299,7 +316,11 @@ def parenCombFormatted(flist):
 
 #abs('(P ∨ P) ↔ P')
 
-main('P ∨ ¬Q ∨ P ↔ P', [['∨', '∧'], ['→', '↔'], ['¬']])
+if __name__ == "__main__":
+    readFile()
+
+#readFile(r"C:\Users\dania\Documents\college\Fall2021Co-op\fall-2021\test.txt")
+#main('P ∨ ¬Q ∨ P ↔ P', [['∨', '∧'], ['→', '↔'], ['¬']])
 #main('P ∨ P ↔ P', [['∨', '∧'], ['→', '↔']])
 # main('x > 1 → x > 0', [['>', '<'], ['→', '↔']])
 # sf = Solver()
