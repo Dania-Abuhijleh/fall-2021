@@ -36,9 +36,9 @@ class PropParser(Parser):
 
             term = self.match('term')
             if op == '+':
-                rv = Int(rv) + Int(term)
+                rv = rv + term #Int(rv) + Int(term)
             else:
-                rv = Int(rv) - Int(term)
+                rv = rv - term #Int(rv) - Int(term)
         return rv
 
     def term(self):
@@ -49,9 +49,9 @@ class PropParser(Parser):
                 break
             term = self.match('factor')
             if op == '*':
-                rv = Int(rv) * Int(term)
+                rv = rv * term #Int(rv) * Int(term)
             else:
-                rv = Int(rv) / Int(term)
+                rv = rv / term #Int(rv) / Int(term)
         return rv
     
     def factor(self):
@@ -82,6 +82,14 @@ class PropParser(Parser):
             return rv
 
     def lit(self):
+        # ADDED THIS start
+        prevPos = self.pos
+        try:
+            rv = self.match('ineq')
+            return rv
+        except ParseError:
+            self.pos = prevPos
+        # TILL HERE end
         if self.maybe_keyword('('):
             rv = self.match('equiv')
             self.keyword(')')
