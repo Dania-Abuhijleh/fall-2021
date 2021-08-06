@@ -1,7 +1,7 @@
 from pathlib import Path
 print('Running' if __name__ == '__main__' else 'Importing', Path(__file__).resolve())
 
-from package.parse.parser import Parser
+from package.parse.parser import Parser, ParseError
 from typing import Set
 from pythonds.basic import Stack
 from pythonds.trees import BinaryTree
@@ -14,6 +14,14 @@ class ParseTree(Parser):
 
     
     def lit(self):
+        # ADDED THIS start
+        prevPos = self.pos
+        try:
+            rv = self.match('ineq')
+            return rv
+        except ParseError:
+            self.pos = prevPos
+        # TILL HERE end
         if self.maybe_keyword('('):
             rv = self.match('equiv')
             self.keyword(')')
@@ -26,7 +34,7 @@ class ParseTree(Parser):
             if char is None:
                 break
             chars.append(char)
-        if self.maybe_keyword('+','-','*','/','=','>','<'): #TODO: add leq <= and geq >=
+        if self.maybe_keyword('+','-','*','/','=','>','<', '≤', '≥'):
             self.pos = prevPos
             return None
         rv = BinaryTree('')
