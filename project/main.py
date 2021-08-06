@@ -6,6 +6,9 @@ print('Running' if __name__ == '__main__' else 'Importing', Path(__file__).resol
 # then produce all permutations of the abstracted formula by changing operators
 # can I use z3 for this by abstracting operators into unknown functions (like f represents and, or) then enumerate all models and reconstruct formula for each model?
 from typing import List, Set
+import builtins
+builtins.Z3_LIB_DIRS = ['C:/Users/dania/AppData/Local/Programs/Python/Python39/Lib/site-packages/z3/lib/libz3.dll']
+import z3
 from z3 import *
 from pythonds.basic import Stack
 from pythonds.trees import BinaryTree
@@ -15,26 +18,30 @@ import string
 #from .parseTree import ParseTree
 from package.parseTree import ParseTree
 from package.propParser import PropParser
+from package.parseFormula import PropLength
 import click
 import ast
 
+
 global listOfOperators
+global EQ_OPERATORS
+EQ_OPERATORS = ['=', '>', '<', '≤', '≥']
 
 @click.command()
 @click.argument('filepath', type=click.Path(exists=True))
-def readFile(filepath):
+def main(filepath):
     with open(filepath, 'r', encoding='utf-8-sig') as f:
         formula = f.readline()
         operators = ast.literal_eval(f.readline())
         print(formula)
         print(operators)
-        main(formula, operators)
+        mainResult(formula, operators)
 
 #take in list of lists of operators
 # @click.command()
 # @click.argument('strFormula')
 # @click.argument('operators', type=List)
-def main(strFormula, operators):
+def mainResult(strFormula, operators):
     #click.echo('Enter the formula as a string and a list of lists of operators')
     global listOfOperators
     listOfOperators = operators
@@ -161,7 +168,7 @@ def getModels():
                 raise Z3Exception("arrays and uninterpreted sorts are not supported")
             block.append(c != m[d])
         s.add(Or(block))
-    print(result)
+    #print(result)
     return result
 
 T1 = ['∨', '∧']
@@ -188,7 +195,7 @@ def getFormulas(listOfModels, abstractedTree):
 
 
 def getFormula(model, abstractedTree): 
-    print(model) 
+    #print(model) 
     formula = []
     #i = 0
     global modelIdx
@@ -204,7 +211,7 @@ def getFormula(model, abstractedTree):
         matched = False
         for index,listOp in enumerate(listOfOperators):
             if rootVal == 't' + str(index):
-                print(Int(var[modelIdx]))
+                # print(Int(var[modelIdx]))
                 # idx = model[Int(var[modelIdx])].as_long()
                 idx = model[(var[modelIdx])].as_long()
                 formula.append(listOp[idx])
@@ -226,7 +233,7 @@ def getFormula(model, abstractedTree):
         matched = False
         for index,listOp in enumerate(listOfOperators):
             if rootVal == 't' + str(index):
-                print(Int(var[modelIdx]))
+                # print(Int(var[modelIdx]))
                 # idx = model[Int(var[modelIdx])].as_long()
                 idx = model[(var[modelIdx])].as_long()
                 formula.append(listOp[idx])
@@ -280,13 +287,18 @@ def checkValid(z3_exp):
 #             listParens(l, pos + 1, n, open + 1, close, res)
 
 
-def parenComb(f, allOperators):
+def parenComb(formula, allOperators):
+    f = formula.replace(')', '')
+    f = f.replace('(', '')
     listf = f.split()
     res = []
+    global EQ_OPERATORS
     for i in range(0, len(f)):
-        if f[i] not in allOperators and f[i] != ' ':
+        if f[i] not in allOperators and f[i] != ' ' and f[i] != ')':
             for j in range(i+1, len(f)):
-                if f[j] not in allOperators and f[j] != ' ':
+                if f[j] in EQ_OPERATORS:
+                        break
+                if f[j] not in allOperators and f[j] != ' ' and f[j] != '(':
                     str = f[:i] + '(' + f[i:j+1] + ')' + f[j+1:]
                     res.append(str)
     return res
@@ -316,13 +328,21 @@ def parenCombFormatted(flist):
 
 #abs('(P ∨ P) ↔ P')
 
-if __name__ == "__main__":
-    readFile()
+# if __name__ == "__main__":  #TODO: uncomment
+#     main()
 
-#readFile(r"C:\Users\dania\Documents\college\Fall2021Co-op\fall-2021\test.txt")
-#main('P ∨ ¬Q ∨ P ↔ P', [['∨', '∧'], ['→', '↔'], ['¬']])
-#main('P ∨ P ↔ P', [['∨', '∧'], ['→', '↔']])
-# main('x > 1 → x > 0', [['>', '<'], ['→', '↔']])
+print(z3.__file__)
+
+# parser = PropLength() #TODO: What to consider? # of props, # of operations, 
+# p = parser.parse('P ∨ ¬Q ∨ P ↔ P')
+# print(p)
+
+#main(r"C:\Users\dania\Documents\college\Fall2021Co-op\fall-2021\test.txt")
+#mainResult('(P ↔ Q) ↔ ((P → Q) ∧ (Q → P))', [['∨', '∧'], ['→', '↔'], ['¬']])
+mainResult('(x + y) + 1 = x + (y + 1)', [['+', '-'], ['=']]) #TODO: Parse Error
+#mainResult('P ∨ ¬Q ∨ P ↔ P', [['∨', '∧'], ['→', '↔'], ['¬']])
+#mainResult('P ∨ P ↔ P', [['∨', '∧'], ['→', '↔']])
+# mainResult('x > 1 → x > 0', [['>', '<'], ['→', '↔']])
 # sf = Solver()
 # exp = (Int('x') < 1) == (Int('x') > 0)
 # exp2 = Implies(Int('x') > 1, Int('x') > 0)
