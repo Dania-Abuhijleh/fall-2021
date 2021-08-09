@@ -5,7 +5,12 @@ from z3 import *
 
 class PropParser(Parser):
     def start(self):
-        return self.equiv()
+        # try:
+            rv = self.equiv()
+        #     self.assert_end()
+        # except ParseError:
+        #     rv = self.ineq()
+            return rv
 
     def ineq(self):
         l = self.match('exp')
@@ -83,18 +88,24 @@ class PropParser(Parser):
 
     def lit(self):
         # ADDED THIS start
-        prevPos = self.pos
-        try:
-            rv = self.match('ineq')
-            return rv
-        except ParseError:
-            self.pos = prevPos
+        # prevPos = self.pos
+        # try:
+        #     rv = self.match('ineq')
+        #     return rv
+        # except ParseError:
+        #     self.pos = prevPos
         # TILL HERE end
+        prevPos = self.pos
         if self.maybe_keyword('('):
             rv = self.match('equiv')
             self.keyword(')')
+            # ADDED THIS start
+            if self.maybe_keyword('+','-','*','/','=','>','<', '≤', '≥'): #TODO: add leq <= and geq >=
+                self.pos = prevPos
+                return None
+            # TILL HERE end
             return rv
-        prevPos = self.pos
+        prevPos = self.pos #and added this
         chars = []
         try:
             chars.append(self.char('A-Za-z')) #TODO: then return None if this is an exception???
