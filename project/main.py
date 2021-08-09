@@ -19,6 +19,7 @@ import string
 from package.parseTree import ParseTree
 from package.propParser import PropParser
 from package.parseFormula import PropLength
+from package.parse.parser import ParseError
 import click
 import ast
 
@@ -55,7 +56,9 @@ def mainResult(strFormula, operators):
     for l in listOfOperators:
         listOfAllOper.extend(l)
     #print(getModels())
-    result = getFormulas(getModels(), pt)
+    # result = getFormulas(getModels(), pt)
+    formulas = getFormulas(getModels(), pt)
+    result = getFormulasFormatted(formulas)
     result.extend(parenCombFormatted(parenComb(strFormula, listOfAllOper)))
     print(result)
 
@@ -184,14 +187,28 @@ def getFormulas(listOfModels, abstractedTree):
         modelIdx = 0
         list = getFormula(l, abstractedTree)
         formula = " ".join(list)
+        result.append(formula)
+        # parser = PropParser()
+        # z3_exp = parser.parse(formula)
+        # # print(z3_exp)
+        # valid = checkValid(z3_exp)
+        # sat = checkSat(z3_exp)
+        # #result.append(" ".join(list))
+        # result.append(" ".join([formula, valid, sat]))
+    return result
+
+def getFormulasFormatted(flist):
+    result = []
+    diffList = listDiff(flist, 0, 1)
+    for index,formula in enumerate(flist):
         parser = PropParser()
         z3_exp = parser.parse(formula)
-        # print(z3_exp)
         valid = checkValid(z3_exp)
         sat = checkSat(z3_exp)
-        #result.append(" ".join(list))
-        result.append(" ".join([formula, valid, sat]))
+        diff = diffList[index]
+        result.append(" ".join([formula, valid, sat, str(diff)]))
     return result
+
 
 
 def getFormula(model, abstractedTree): 
@@ -307,12 +324,37 @@ def parenCombFormatted(flist):
     result = []
     parser = PropParser()
     for f in flist:
-        z3_exp = parser.parse(f)
+        try:
+            z3_exp = parser.parse(f)
+        except ParseError:
+            print(f)
+            break
         #print(z3_exp)
         valid = checkValid(z3_exp)
         sat = checkSat(z3_exp)
         result.append(" ".join([f, valid, sat]))
     return result
+
+def syntacticDifficulty(formula):
+    parser = PropLength() #TODO: What to consider? # of props, # of operations, 
+    diffTuple = parser.parse(formula)
+    #(len, numOp, numProp, numDiffProp, numDiffOp, seenOP, seenProp)
+    res = 0.2*diffTuple[0] + 0.1*diffTuple[1] + 0.1*diffTuple[2] + 0.3*diffTuple[3] + 0.3*diffTuple[4]
+    return res
+
+def listDiff(flist, minRange, maxRange):
+    diffs = []
+    res = []
+    for f in flist:
+        diffs.append(syntacticDifficulty(f))
+    maxD = max(diffs)
+    minD = 0
+    for d in diffs:
+        r = (maxRange - minRange) * ((d - minD)/(maxD - minD)) + minRange
+        res.append(r)
+    return res
+
+
 
 #print(parenComb('5 * 3 / 2 - 4', ['*', '/', '-']))
 #print(listParens([''] * 2 * 2, 0, 2, 0, 0, []))
@@ -328,21 +370,34 @@ def parenCombFormatted(flist):
 
 #abs('(P ∨ P) ↔ P')
 
-# if __name__ == "__main__":  #TODO: uncomment
-#     main()
+if __name__ == "__main__":  #TODO: uncomment
+    main()
 
 print(z3.__file__)
 
+# S = set(('P'))
+# print(S)
+# S.add('U')
+# print(S)
+# S1 = set(('P'))
+# S2 = set(('Q', 'P'))
+# S1.update(S2)
+# print(S1)
+# S = set()
+# S.add('P')
+# print(S)
 # parser = PropLength() #TODO: What to consider? # of props, # of operations, 
-# p = parser.parse('P ∨ ¬Q ∨ P ↔ P')
+# p = parser.parse('P ∨ ¬Q ∨ R ↔ P') #(8, 4, 4, 3, 3, {'∨', '¬', '↔'}, {'R', 'P', 'Q'})
 # print(p)
+# print(syntacticDifficulty('P ∨ ¬Q ∨ R ↔ P'))
+#(len, numOp, numProp, numDiffProp, numDiffOp, seenOP, seenProp)
 
 #main(r"C:\Users\dania\Documents\college\Fall2021Co-op\fall-2021\test.txt")
 #mainResult('(P ↔ Q) ↔ ((P → Q) ∧ (Q → P))', [['∨', '∧'], ['→', '↔'], ['¬']])
-mainResult('(x + y) + 1 = x + (y + 1)', [['+', '-'], ['=']]) #TODO: Parse Error
+#mainResult('(x + y) + 1 = x + (y + 1)', [['+', '-'], ['=']]) #TODO: Parse Error
 #mainResult('P ∨ ¬Q ∨ P ↔ P', [['∨', '∧'], ['→', '↔'], ['¬']])
 #mainResult('P ∨ P ↔ P', [['∨', '∧'], ['→', '↔']])
-# mainResult('x > 1 → x > 0', [['>', '<'], ['→', '↔']])
+#mainResult('x > 1 → x > 0', [['>', '<'], ['→', '↔']])
 # sf = Solver()
 # exp = (Int('x') < 1) == (Int('x') > 0)
 # exp2 = Implies(Int('x') > 1, Int('x') > 0)
