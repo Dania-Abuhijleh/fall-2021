@@ -26,6 +26,6 @@ then run an example file like so:
 
 Input a file with the formula on one line and the list of lists of operators on the next line.
 
-Run main.exe by going into the dist directory and typing 'cmd /k main.exe' on a command line, then 
+In the directory where main.py is 
 
 Invoke the command from your terminal with the file path: python main.py '/path/to/example.txt'
