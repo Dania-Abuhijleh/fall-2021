@@ -7,7 +7,7 @@ Download Python
 Download Git
 
 Download z3:
-```jsx
+```
 git clone https://github.com/Z3Prover/z3.git
 cd z3
 
