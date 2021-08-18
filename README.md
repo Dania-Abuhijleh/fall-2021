@@ -48,6 +48,7 @@ Where C:\...\z3\build is the path to \z3\build on your computer.
 Go to your System Environment Variables and add the 'build\python' directory in your z3 folder to the PYTHONPATH environment variable and add the 'build' directory to the PATH environment variable. Also add 'C:\...\Python\Python39\Scripts' (just an example use the Python path from your computer that ends with \Scripts) to the PATH environment variable.
 
 Next download pip if you don't already have it. `curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py`
+
 Next do `pip install pythonds` and `pip install click`
 
 Note that you may have to restart your command prompt after downloading anything.
