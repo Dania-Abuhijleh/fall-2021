@@ -55,3 +55,5 @@ Note that you may have to restart your command prompt after downloading anything
 
 Now we are ready to run the example file.
 Still in your command prompt, Navigate to the folder that contains main.py `cd C:\...\project` and run this command `python main.py C:\...\examples\example1.txt` 
+
+If you run into issues check that your bit versions of python and z3 are compatible (i.e. both 32 bit or both 64 bit). If that is fine check that you added the mentioned paths to your system environment variables.
