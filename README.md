@@ -2,6 +2,8 @@
 
 This program takes a propositional formula and returns a list of formulas similar to the original one by substituting the operations in all possible combinations. You must provide a list of lists of operators, the operators in the same list can be substituted for one another. For example if I provide [['∨', '∧'], ['→', '↔'], ['¬']] this means '∨' and '∧' are interchangable for each other but not for '¬'. Mathematical operators and integers are also supported.
 
+# Linux
+
 Download Python
 
 Download Git
@@ -54,6 +56,7 @@ Next do `pip install pythonds` and `pip install click`
 Note that you may have to restart your command prompt after downloading anything.
 
 Now we are ready to run the example file.
+Download this repo `git clone `
 Still in your command prompt, Navigate to the folder that contains main.py `cd C:\...\project` and run this command `python main.py C:\...\examples\example1.txt` 
 
 If you run into issues check that your bit versions of python and z3 are compatible (i.e. both 32 bit or both 64 bit). If that is fine check that you added the mentioned paths to your system environment variables.
