@@ -37,7 +37,8 @@ After selecting the Advanced options, click Install to start installation. Verif
 
 Download Git if you do not already have it.
 
-Download Z3: For Windows, this requires a Visual Studio command prompt. Download VS for windows if you don't have it. As documented here: https://docs.microsoft.com/en-us/visualstudio/ide/reference/command-prompt-powershell?view=vs-2019 Then on the start menu under Visual Studio click the drop down next to the folder. You should see something similar to 'x64 Native Tools Command Prompt for VS 2017' It doesn't have to be the 2017 version as this is just an example. Click on it and you will see a VS command prompt open. Now type ( if you have x64 bit python then the third line should be `python3 scripts/mk_make.py -x --python` to download the 64 bit version of Z3) Note: if you have x64 version of Python then you must download the x64 DLL of z3 otherwise errors will arise.
+Download Z3: For Windows, this requires a Visual Studio command prompt. Download VS for windows if you don't have it. As documented here: https://docs.microsoft.com/en-us/visualstudio/ide/reference/command-prompt-powershell?view=vs-2019 Then on the start menu under Visual Studio click the drop down next to the folder. You should see something similar to 'x64 Native Tools Command Prompt for VS 2017' It doesn't have to be the 2017 version as this is just an example. Click on it and you will see a VS command prompt open. Another example of how to do this here: https://edk2-docs.gitbook.io/uefi_driver_hii_win_lab_guide/microsoft_windows_10__visual_studio_command_prompt
+Now type the commands below (if you have x64 bit python then the third line should be `python3 scripts/mk_make.py -x --python` to download the 64 bit version of Z3) **Note: if you have x64 version of Python then you must download the x64 DLL of z3 otherwise errors will arise.**
 ```
 git clone https://github.com/Z3Prover/z3.git
 cd z3
