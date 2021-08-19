@@ -29,16 +29,19 @@ Navigate to the directory where main.py is in your terminal and invoke the comma
 
 # Windows
 Download Python:
-Open the official python website and navigate to the download tab for Windows. Click on the latest python release and download a Windows executable installer suitable for your system (check to make sure you download 32-bit installer if your system is 32-bit, and 64-bit installer otherwise). Once it is downloaded run the installer. Check the Install launcher for all users check box and check the Add Python 3.7 to path check box to include the interpreter in the execution path. Then select Customize installation and choose all the optional features. Click next. This takes you to Advanced Options available while installing Python. Here, select the Install for all users and Add Python to environment variables check boxes. Select the Associate files with Python, Create shortcuts for installed applications and other advanced options. Make note of the python installation directory displayed in this step. You would need it for the next step.
+Open the official python website and navigate to the download tab for Windows https://www.python.org/downloads/windows/. Click on the latest python release and download a Windows executable installer suitable for your system (check to make sure you download 32-bit installer if your system is 32-bit, and 64-bit installer otherwise). 
+![image](https://user-images.githubusercontent.com/57302458/130057266-f36c80a5-2f9d-4732-b26f-2fe97549bdf7.png)
+
+Once it is downloaded run the installer. Check the Install launcher for all users check box and check the Add Python 3.7 to path check box to include the interpreter in the execution path. Then select Customize installation and choose all the optional features. Click next. This takes you to Advanced Options available while installing Python. Here, select the Install for all users and Add Python to environment variables check boxes. Select the Associate files with Python, Create shortcuts for installed applications and other advanced options. Make note of the python installation directory displayed in this step. You would need it for the next step.
 After selecting the Advanced options, click Install to start installation. Verify the python installation by searching for the command prompt and type “python”. (Instructions from https://www.journaldev.com/30076/install-python-windows-10)
 
 Download Git if you do not already have it.
 
-Download Z3: For Windows, this requires a Visual Studio command prompt. Download VS for windows if you don't have it. Then on the start menu under Visual Studio click the drop down next to the folder. You should see something similar to 'x64 Native Tools Command Prompt for VS 2017' It doesn't have to be the 2017 version as this is just an example. Click on it and you will see a VS command prompt open. Now type ( if you have x64 bit python then the third line should be `python3 scripts/mk_make.py -x --python` to download the 64 bit version of Z3) Note: if you have x64 version of Python then you must download the x64 DLL of z3 otherwise errors will arise.
+Download Z3: For Windows, this requires a Visual Studio command prompt. Download VS for windows if you don't have it. As documented here: https://docs.microsoft.com/en-us/visualstudio/ide/reference/command-prompt-powershell?view=vs-2019 Then on the start menu under Visual Studio click the drop down next to the folder. You should see something similar to 'x64 Native Tools Command Prompt for VS 2017' It doesn't have to be the 2017 version as this is just an example. Click on it and you will see a VS command prompt open. Now type ( if you have x64 bit python then the third line should be `python3 scripts/mk_make.py -x --python` to download the 64 bit version of Z3) Note: if you have x64 version of Python then you must download the x64 DLL of z3 otherwise errors will arise.
 ```
 git clone https://github.com/Z3Prover/z3.git
 cd z3
-python3 scripts/mk_make.py --python
+python scripts/mk_make.py --python
 cd C:\...\z3\build && nmake
 ```
 Where C:\...\z3\build is the path to \z3\build on your computer.
