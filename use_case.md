@@ -42,6 +42,7 @@ Which of the following apply to the formulas below: satisfiable, unsatisfiable, 
 
 
 --------------------- Sample HW -------------------------
+
 Q1. Prove the following:
 
 - P ∨ P → P, proof:
@@ -51,6 +52,9 @@ Q1. Prove the following:
 Q2. Which of the following apply to the formulas below: satisfiable, unsatisfiable, falsifiable, valid? If any formula is valid, write it's proof.
 
 - (P → Q) → ((P → Q) ∧ (Q → P))  invalid, satisfiable
+
 - (P <=> Q) → ((P → Q) ∧ (Q → P)) valid, satisfiable. proof:
+
 - (1 > x) == (0 < x) invalid, unsatisfiable
+
 - (1 > x) == (0 > x) invalid, satisfiable
