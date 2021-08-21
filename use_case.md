@@ -58,3 +58,5 @@ Q2. Which of the following apply to the formulas below: satisfiable, unsatisfiab
 - (1 > x) == (0 < x) invalid, unsatisfiable
 
 - (1 > x) == (0 > x) invalid, satisfiable
+
+- (x => (y => z)) => ((x ∧ y) => z) valid, satisfiable. proof:
