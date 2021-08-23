@@ -2,7 +2,7 @@
 
 This program takes a propositional formula and returns a list of formulas similar to the original one by substituting the operations in all possible combinations. You must provide a list of lists of operators, the operators in the same list can be substituted for one another. For example if I provide [['∨', '∧'], ['→', '↔'], ['¬']] this means '∨' and '∧' are interchangable for each other but not for '¬'. Mathematical operators and integers are also supported.
 
-Check the example files to see the syntax. Input a file with the formula on one line and the list of lists of operators on the next line.
+Check the example files to see the syntax. Input a file with the formula on one line (SMT 2.0 format) and the list of lists of operators (z3 format) on the next line. SMT 2.0 is described here https://smtlib.cs.uiowa.edu/papers/smt-lib-reference-v2.0-r10.12.21.pdf
 
 # Linux
 
