@@ -36,242 +36,254 @@ def main(filepath):
         operators = ast.literal_eval(f.readline())
         print(formula)
         print(operators)
-        mainResult(formula, operators)
+        #mainResultOne(formula, operators)
+        fGenLean = FormulaGenLEANsyntax(listOfOperators=operators, strFormula=formula)
+        fGenLean.mainResultOne()
 
 #take in list of lists of operators
 # @click.command()
 # @click.argument('strFormula')
 # @click.argument('operators', type=List)
-def mainResult(strFormula, operators):
-    #click.echo('Enter the formula as a string and a list of lists of operators')
-    global listOfOperators
-    listOfOperators = operators
-    parser = ParseTree()
-    pt = parser.parse(strFormula)
-    print(pt)
-    absTree(pt)
-    conc(pt, s)
-    print(postorder(pt))
-    listOfAllOper = []
-    for l in listOfOperators:
-        listOfAllOper.extend(l)
-    #print(getModels())
-    # result = getFormulas(getModels(), pt)
-    formulas = getFormulas(getModels(), pt)
-    result = getFormulasFormatted(formulas)
-    result.extend(parenCombFormatted(parenComb(strFormula, listOfAllOper)))
-    print(result)
 
-def buildParseTree(fpexp):
-    fplist = fpexp.split()
-    pStack = Stack()
-    eTree = BinaryTree('')
-    pStack.push(eTree)
-    currentTree = eTree
+class FormulaGenLEANsyntax:
+    def __init__(self, listOfOperators, strFormula):
+        self.listOfOperators = listOfOperators
+        self.strFormula = strFormula
+        self.idx = 0
+        self.var = string.ascii_lowercase
+        self.modelIdx = 0
+        self.EQ_OPERATORS = ['=', '>', '<', '≤', '≥']
+        self.s = Solver()
 
-    for i in fplist:
-        if i == '(':
-            currentTree.insertLeft('')
-            pStack.push(currentTree)
-            currentTree = currentTree.getLeftChild()
+    def mainResultOne(self): #,strFormula, operators):
+        #click.echo('Enter the formula as a string and a list of lists of operators')
+        #global listOfOperators
+        #listOfOperators = operators
+        parser = ParseTree()
+        pt = parser.parse(self.strFormula)
+        print(pt)
+        self.absTree(pt)
+        self.conc(pt, self.s)
+        #print(postorder(pt))
+        listOfAllOper = []
+        for l in self.listOfOperators:
+            listOfAllOper.extend(l)
+        #print(getModels())
+        # result = getFormulas(getModels(), pt)
+        formulas = self.getFormulas(self.getModels(), pt)
+        result = self.getFormulasFormatted(formulas)
+        result.extend(self.parenCombFormatted(self.parenComb(self.strFormula, listOfAllOper)))
+        print(result)
 
-        elif i in ['∧', '∨', '→', '↔']:
-            currentTree.setRootVal(i)
-            currentTree.insertRight('')
-            pStack.push(currentTree)
-            currentTree = currentTree.getRightChild()
+# def buildParseTree(fpexp):
+#     fplist = fpexp.split()
+#     pStack = Stack()
+#     eTree = BinaryTree('')
+#     pStack.push(eTree)
+#     currentTree = eTree
 
-        elif i == ')':
-            currentTree = pStack.pop()
+#     for i in fplist:
+#         if i == '(':
+#             currentTree.insertLeft('')
+#             pStack.push(currentTree)
+#             currentTree = currentTree.getLeftChild()
 
-        elif i not in ['∧', '∨', '→', '↔']:
-            try:
-                currentTree.setRootVal(i)
-                parent = pStack.pop()
-                currentTree = parent
+#         elif i in ['∧', '∨', '→', '↔']:
+#             currentTree.setRootVal(i)
+#             currentTree.insertRight('')
+#             pStack.push(currentTree)
+#             currentTree = currentTree.getRightChild()
 
-            except ValueError:
-                raise ValueError("token '{}' is not a valid integer".format(i))
-    return eTree
+#         elif i == ')':
+#             currentTree = pStack.pop()
 
-def postorder(tree):
-    if tree != None:
-        postorder(tree.getLeftChild())
-        postorder(tree.getRightChild())
-        print(tree.getRootVal())
+#         elif i not in ['∧', '∨', '→', '↔']:
+#             try:
+#                 currentTree.setRootVal(i)
+#                 parent = pStack.pop()
+#                 currentTree = parent
 
-def absTree(tree):
-    if tree != None:
-        absTree(tree.getLeftChild())
-        absTree(tree.getRightChild())
+#             except ValueError:
+#                 raise ValueError("token '{}' is not a valid integer".format(i))
+#     return eTree
+
+    def postorder(self, tree):
+        if tree != None:
+            self.postorder(tree.getLeftChild())
+            self.postorder(tree.getRightChild())
+            print(tree.getRootVal())
+
+    def absTree(self,tree):
+        if tree != None:
+            self.absTree(tree.getLeftChild())
+            self.absTree(tree.getRightChild())
+            global listOfOperators
+            rootVal = tree.getRootVal()
+            for index,listOp in enumerate(self.listOfOperators):
+                if rootVal in listOp:
+                    tree.setRootVal('t' + str(index))
+                    break
+
+    def numConc(self, s):
         global listOfOperators
-        rootVal = tree.getRootVal()
-        for index,listOp in enumerate(listOfOperators):
-            if rootVal in listOp:
-                tree.setRootVal('t' + str(index))
-                break
+        for index,listOp in enumerate(self.listOfOperators):
+            if s == 't' + str(index):
+                return len(listOp)
+        return 1
 
-def numConc(s):
-    global listOfOperators
-    for index,listOp in enumerate(listOfOperators):
-        if s == 't' + str(index):
-            return len(listOp)
-    return 1
+    def numOfConcretizations(self, abstractedTree):
+        res = 1
+        if abstractedTree != None:
+            res *= self.numConc(abstractedTree.getRootVal())
+        return res
 
-def numOfConcretizations(abstractedTree):
-    res = 1
-    if abstractedTree != None:
-        res *= numConc(abstractedTree.getRootVal())
-    return res
-
-var = string.ascii_lowercase
-global idx 
-idx = 0
-def freshVariable():
-    global idx
-    res = var[idx]
-    idx += 1
-    return Int(res)
+    # var = string.ascii_lowercase
+    # global idx 
+    # idx = 0
+    def freshVariable(self):
+        global idx
+        res = self.var[self.idx]
+        self.idx += 1
+        return Int(res)
 
 
-s = Solver()
-def conc(abstractedTree, solver):
-    if abstractedTree != None:
-        conc(abstractedTree.getLeftChild(), solver)
-        global listOfOperators
-        rootVal = abstractedTree.getRootVal()
-        for index in range(len(listOfOperators)):
-            if rootVal == 't' + str(index):
-                x = freshVariable()
-                numConc = numOfConcretizations(abstractedTree)
-                
-                solver.add(0<=x, x<numConc)
-                # if abstractedTree != None:
-                #     conc(abstractedTree.getLeftChild(), solver)
-                #     conc(abstractedTree.getRightChild(), solver)
-                conc(abstractedTree.getRightChild(), solver)
+    
+    def conc(self, abstractedTree, solver):
+        if abstractedTree != None:
+            self.conc(abstractedTree.getLeftChild(), solver)
+            global listOfOperators
+            rootVal = abstractedTree.getRootVal()
+            for index in range(len(self.listOfOperators)):
+                if rootVal == 't' + str(index):
+                    x = self.freshVariable()
+                    numConc = self.numOfConcretizations(abstractedTree)
+                    
+                    solver.add(0<=x, x<numConc)
+                    # if abstractedTree != None:
+                    #     conc(abstractedTree.getLeftChild(), solver)
+                    #     conc(abstractedTree.getRightChild(), solver)
+                    self.conc(abstractedTree.getRightChild(), solver)
 
-def getModels():
-    result = []
-    while s.check() == sat:
-        m = s.model()
-        dict = {}
-        for d in m:
-            dict[str(d)] = m[d]
-        result.append(dict)
-        # Create a new constraint the blocks the current model
-        block = []
-        for d in m:
-            # d is a declaration
-            if d.arity() > 0:
-                raise Z3Exception("uninterpreted functions are not supported")
-            # create a constant from declaration
-            c = d()
-            if is_array(c) or c.sort().kind() == Z3_UNINTERPRETED_SORT:
-                raise Z3Exception("arrays and uninterpreted sorts are not supported")
-            block.append(c != m[d])
-        s.add(Or(block))
-    #print(result)
-    return result
+    def getModels(self):
+        result = []
+        while self.s.check() == sat:
+            m = self.s.model()
+            dict = {}
+            for d in m:
+                dict[str(d)] = m[d]
+            result.append(dict)
+            # Create a new constraint the blocks the current model
+            block = []
+            for d in m:
+                # d is a declaration
+                if d.arity() > 0:
+                    raise Z3Exception("uninterpreted functions are not supported")
+                # create a constant from declaration
+                c = d()
+                if is_array(c) or c.sort().kind() == Z3_UNINTERPRETED_SORT:
+                    raise Z3Exception("arrays and uninterpreted sorts are not supported")
+                block.append(c != m[d])
+            self.s.add(Or(block))
+        #print(result)
+        return result
 
-T1 = ['∨', '∧']
-T2 = ['→', '↔']
-global modelIdx
-def getFormulas(listOfModels, abstractedTree):
-    result = []
-    #print(listOfModels)
-    for l in listOfModels:
-        #print(l)
-    #for i in range(len(var)):
-        global modelIdx
-        modelIdx = 0
-        list = getFormula(l, abstractedTree)
-        formula = " ".join(list)
-        result.append(formula)
-        # parser = PropParser()
-        # z3_exp = parser.parse(formula)
-        # # print(z3_exp)
-        # valid = checkValid(z3_exp)
-        # sat = checkSat(z3_exp)
-        # #result.append(" ".join(list))
-        # result.append(" ".join([formula, valid, sat]))
-    return result
 
-def getFormulasFormatted(flist):
-    result = []
-    diffList = listDiff(flist, 0, 1)
-    for index,formula in enumerate(flist):
-        parser = PropParser()
-        z3_exp = parser.parse(formula)
-        valid = checkValid(z3_exp)
-        sat = checkSat(z3_exp)
-        diff = diffList[index]
-        result.append(" ".join([formula, valid, sat, str(diff)]))
-    return result
+    # global modelIdx
+    def getFormulas(self, listOfModels, abstractedTree):
+        result = []
+        #print(listOfModels)
+        for l in listOfModels:
+            #print(l)
+        #for i in range(len(var)):
+            #global modelIdx
+            self.modelIdx = 0
+            list = self.getFormula(l, abstractedTree)
+            formula = " ".join(list)
+            result.append(formula)
+            # parser = PropParser()
+            # z3_exp = parser.parse(formula)
+            # # print(z3_exp)
+            # valid = checkValid(z3_exp)
+            # sat = checkSat(z3_exp)
+            # #result.append(" ".join(list))
+            # result.append(" ".join([formula, valid, sat]))
+        return result
+
+    def getFormulasFormatted(self, flist):
+        result = []
+        diffList = self.listDiff(flist, 0, 1)
+        for index,formula in enumerate(flist):
+            parser = PropParser()
+            z3_exp = parser.parse(formula)
+            valid = self.checkValid(z3_exp)
+            sat = self.checkSat(z3_exp)
+            diff = diffList[index]
+            result.append(" ".join([formula, valid, sat, str(diff)]))
+        return result
 
 
 
-def getFormula(model, abstractedTree): 
-    #print(model) 
-    formula = []
-    #i = 0
-    global modelIdx
-    x = var[modelIdx] #x = var[i]
-    # print("x: ")
-    # print(x)
-    # print("model: ")
-    # print(model[Int(x)])
-    if abstractedTree != None:
-        formula.extend(getFormula(model, abstractedTree.getLeftChild()))
-        rootVal = abstractedTree.getRootVal()
-        global listOfOperators
-        matched = False
-        for index,listOp in enumerate(listOfOperators):
-            if rootVal == 't' + str(index):
-                # print(Int(var[modelIdx]))
-                # idx = model[Int(var[modelIdx])].as_long()
-                idx = model[(var[modelIdx])].as_long()
-                formula.append(listOp[idx])
-                modelIdx += 1
-                matched = True
-        if not matched:
-            formula.append(abstractedTree.getRootVal())
-        formula.extend(getFormula(model, abstractedTree.getRightChild()))
-    return formula
+    def getFormula(self, model, abstractedTree): 
+        #print(model) 
+        formula = []
+        #i = 0
+        #global modelIdx
+        x = self.var[self.modelIdx] #x = var[i]
+        # print("x: ")
+        # print(x)
+        # print("model: ")
+        # print(model[Int(x)])
+        if abstractedTree != None:
+            formula.extend(self.getFormula(model, abstractedTree.getLeftChild()))
+            rootVal = abstractedTree.getRootVal()
+            global listOfOperators
+            matched = False
+            for index,listOp in enumerate(self.listOfOperators):
+                if rootVal == 't' + str(index):
+                    # print(Int(var[modelIdx]))
+                    # idx = model[Int(var[modelIdx])].as_long()
+                    idx = model[(self.var[self.modelIdx])].as_long()
+                    formula.append(listOp[idx])
+                    self.modelIdx += 1
+                    matched = True
+            if not matched:
+                formula.append(abstractedTree.getRootVal())
+            formula.extend(self.getFormula(model, abstractedTree.getRightChild()))
+        return formula
 
-def getFormula(model, abstractedTree):  
-    formula = []
-    global modelIdx
-    x = var[modelIdx]
-    if abstractedTree != None:
-        formula.extend(getFormula(model, abstractedTree.getLeftChild()))
-        rootVal = abstractedTree.getRootVal()
-        global listOfOperators
-        matched = False
-        for index,listOp in enumerate(listOfOperators):
-            if rootVal == 't' + str(index):
-                # print(Int(var[modelIdx]))
-                # idx = model[Int(var[modelIdx])].as_long()
-                idx = model[(var[modelIdx])].as_long()
-                formula.append(listOp[idx])
-                modelIdx += 1
-                matched = True
-        if not matched:
-            formula.append(abstractedTree.getRootVal())
-        formula.extend(getFormula(model, abstractedTree.getRightChild()))
-    return formula
+    def getFormula(self, model, abstractedTree):  
+        formula = []
+        #global modelIdx
+        x = self.var[self.modelIdx]
+        if abstractedTree != None:
+            formula.extend(self.getFormula(model, abstractedTree.getLeftChild()))
+            rootVal = abstractedTree.getRootVal()
+            #global listOfOperators
+            matched = False
+            for index,listOp in enumerate(self.listOfOperators):
+                if rootVal == 't' + str(index):
+                    # print(Int(var[modelIdx]))
+                    # idx = model[Int(var[modelIdx])].as_long()
+                    idx = model[(self.var[self.modelIdx])].as_long()
+                    formula.append(listOp[idx])
+                    self.modelIdx += 1
+                    matched = True
+            if not matched:
+                formula.append(abstractedTree.getRootVal())
+            formula.extend(self.getFormula(model, abstractedTree.getRightChild()))
+        return formula
 
-def checkSat(z3_exp):
-    solver = Solver()
-    solver.add(z3_exp)
-    return str(solver.check())
+    def checkSat(self, z3_exp):
+        solver = Solver()
+        solver.add(z3_exp)
+        return str(solver.check())
 
-def checkValid(z3_exp):
-    solver = Solver()
-    solver.add(Not(z3_exp))
-    if solver.check() == unsat:
-        return 'valid'
-    return 'invalid'
+    def checkValid(self, z3_exp):
+        solver = Solver()
+        solver.add(Not(z3_exp))
+        if solver.check() == unsat:
+            return 'valid'
+        return 'invalid'
 
 
 # def allParenPlacement(f, operators):
@@ -304,55 +316,55 @@ def checkValid(z3_exp):
 #             listParens(l, pos + 1, n, open + 1, close, res)
 
 
-def parenComb(formula, allOperators):
-    f = formula.replace(')', '')
-    f = f.replace('(', '')
-    listf = f.split()
-    res = []
-    global EQ_OPERATORS
-    for i in range(0, len(f)):
-        if f[i] not in allOperators and f[i] != ' ' and f[i] != ')':
-            for j in range(i+1, len(f)):
-                if f[j] in EQ_OPERATORS:
-                        break
-                if f[j] not in allOperators and f[j] != ' ' and f[j] != '(':
-                    str = f[:i] + '(' + f[i:j+1] + ')' + f[j+1:]
-                    res.append(str)
-    return res
+    def parenComb(self, formula, allOperators):
+        f = formula.replace(')', '')
+        f = f.replace('(', '')
+        listf = f.split()
+        res = []
+        global EQ_OPERATORS
+        for i in range(0, len(f)):
+            if f[i] not in allOperators and f[i] != ' ' and f[i] != ')':
+                for j in range(i+1, len(f)):
+                    if f[j] in EQ_OPERATORS:
+                            break
+                    if f[j] not in allOperators and f[j] != ' ' and f[j] != '(':
+                        str = f[:i] + '(' + f[i:j+1] + ')' + f[j+1:]
+                        res.append(str)
+        return res
 
-def parenCombFormatted(flist):
-    result = []
-    parser = PropParser()
-    for f in flist:
-        try:
-            z3_exp = parser.parse(f)
-        except ParseError:
-            print(f)
-            break
-        #print(z3_exp)
-        valid = checkValid(z3_exp)
-        sat = checkSat(z3_exp)
-        result.append(" ".join([f, valid, sat]))
-    return result
+    def parenCombFormatted(self, flist):
+        result = []
+        parser = PropParser()
+        for f in flist:
+            try:
+                z3_exp = parser.parse(f)
+            except ParseError:
+                print(f)
+                break
+            #print(z3_exp)
+            valid = self.checkValid(z3_exp)
+            sat = self.checkSat(z3_exp)
+            result.append(" ".join([f, valid, sat]))
+        return result
 
-def syntacticDifficulty(formula):
-    parser = PropLength() #TODO: What to consider? # of props, # of operations, 
-    diffTuple = parser.parse(formula)
-    #(len, numOp, numProp, numDiffProp, numDiffOp, seenOP, seenProp)
-    res = 0.2*diffTuple[0] + 0.1*diffTuple[1] + 0.1*diffTuple[2] + 0.3*diffTuple[3] + 0.3*diffTuple[4]
-    return res
+    def syntacticDifficulty(self, formula):
+        parser = PropLength() #TODO: What to consider? # of props, # of operations, 
+        diffTuple = parser.parse(formula)
+        #(len, numOp, numProp, numDiffProp, numDiffOp, seenOP, seenProp)
+        res = 0.2*diffTuple[0] + 0.1*diffTuple[1] + 0.1*diffTuple[2] + 0.3*diffTuple[3] + 0.3*diffTuple[4]
+        return res
 
-def listDiff(flist, minRange, maxRange):
-    diffs = []
-    res = []
-    for f in flist:
-        diffs.append(syntacticDifficulty(f))
-    maxD = max(diffs)
-    minD = 0
-    for d in diffs:
-        r = (maxRange - minRange) * ((d - minD)/(maxD - minD)) + minRange
-        res.append(r)
-    return res
+    def listDiff(self, flist, minRange, maxRange):
+        diffs = []
+        res = []
+        for f in flist:
+            diffs.append(self.syntacticDifficulty(f))
+        maxD = max(diffs)
+        minD = 0
+        for d in diffs:
+            r = (maxRange - minRange) * ((d - minD)/(maxD - minD)) + minRange
+            res.append(r)
+        return res
 
 
 
@@ -370,10 +382,13 @@ def listDiff(flist, minRange, maxRange):
 
 #abs('(P ∨ P) ↔ P')
 
-if __name__ == "__main__":  #TODO: uncomment
-    main()
+# if __name__ == "__main__":  #TODO: uncomment
+#     main()
 
-print(z3.__file__)
+# print(z3.__file__)
+
+fGenLean = FormulaGenLEANsyntax(listOfOperators=[['∨', '∧'], ['→', '↔']], strFormula='P ∨ P ↔ P')
+fGenLean.mainResultOne()
 
 # S = set(('P'))
 # print(S)
