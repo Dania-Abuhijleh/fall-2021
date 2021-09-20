@@ -21,7 +21,7 @@ sudo make install
 
 pip3 install z3-solver
 ```
-also do `pip3 install pythonds`
+also do `pip3 install pythonds` and `pip install click`
 
 then download this repo by downloading the .zip file and extracting it.
 then run an example file like so:
