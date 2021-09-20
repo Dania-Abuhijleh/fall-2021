@@ -60,7 +60,7 @@ class FormulaGenLEANsyntax:
         #listOfOperators = operators
         parser = ParseTree()
         pt = parser.parse(self.strFormula)
-        print(pt)
+        #print(pt)
         self.absTree(pt)
         self.conc(pt, self.s)
         #print(postorder(pt))
@@ -381,8 +381,8 @@ class FormulaGenLEANsyntax:
 
 #abs('(P ∨ P) ↔ P')
 
-# if __name__ == "__main__":  #TODO: uncomment
-#     main()
+if __name__ == "__main__":  #TODO: uncomment
+    main()
 
 # print(z3.__file__)
 
