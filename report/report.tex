@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass{report}
 \usepackage[utf8]{inputenc}
 
 \title{2021 Fall Co-op}
@@ -10,6 +10,33 @@
 \maketitle
 
 \section{Introduction}
+problem generation
+
+\paragraph{}
+More practice problems for students, help professors in generating questions for homeworks or exams. Helpful if a professor wishes to create different exams of similar difficulty. Or if the goal is to create questions differing from previous semesters. to teach propositional logic
+
+
+\paragraph{}
+Starting problem propositional formula, generating formulas of similar complexity (defined as ) by substituting operators. The substitution is driven by user input in the form of lists of operators. Operators placed in the same list are seen as interchangeable. However, the transitive property does not apply on these lists because of the abstration done first. This means if you have the list ['=', '>'] and ['=','=>'] the formula x > 1 cannot become x => 1 since '>' and '=>' do not appear in the same list. 
+
+
+\paragraph{}
+Z3 SAT solver is used to determine if any formula is satisfiable and/or valid. The user then uses that information in the generation of problems. 
+
+
+\paragraph{}
+Comparing resulting formulas with the original one.
+
+\paragraph{}
+Implementation
+
+\begin{itemize}
+\item creating tree, parsing, walking over to abstract, then to concretize
+\item using existing parser from z3 python API
+\end{itemize}
+
+\paragraph{}
+Unified two versions of tools into one tool with options. What format to print output in (LEAN or smt)? Paranthesis (include changing paranthesis location in outputs)? Substitution (substitute operators)?
 
 \\ Shenoy, Varun & Aparanji, Ullas & Sripradha, K. & Kumar, Viraj. (2016). Generating DFA Construction Problems Automatically. 32-37. 10.1109/LaTiCE.2016.8. 
 \newline
